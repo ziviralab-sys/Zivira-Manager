@@ -1,0 +1,90 @@
+"use client";
+import clsx from "clsx";
+import { BarChart3, Grid3x3, Home, LogOut, MapPinned, Moon, PanelLeftClose, PanelLeftOpen, Sun, Users } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { clearToken } from "@/lib/api-client";
+
+const nav = [
+  { href: "/manager/dashboard",      title: "Dashboard",       icon: Home },
+  { href: "/manager/dcrs",           title: "Team DCRs",        icon: BarChart3 },
+  { href: "/manager/tour-plans",     title: "Tour Plans",       icon: MapPinned },
+  { href: "/manager/visit-coverage", title: "Visit Coverage",   icon: Grid3x3 },
+  { href: "/manager/team",           title: "My Team",          icon: Users }
+];
+
+export function ManagerShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router   = useRouter();
+  const [theme, setTheme]       = useState<"light"|"dark">("light");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    const t = window.localStorage.getItem("zivira.manager.theme");
+    if (t === "dark" || t === "light") setTheme(t);
+    const s = window.localStorage.getItem("zivira.manager.sidebar");
+    if (s === "closed") setSidebarOpen(false);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem("zivira.manager.theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    window.localStorage.setItem("zivira.manager.sidebar", sidebarOpen ? "open" : "closed");
+  }, [sidebarOpen]);
+
+  if (pathname === "/manager/login") return <>{children}</>;
+
+  function signOut() { clearToken(); router.push("/manager/login"); }
+
+  return (
+    <div className="app-shell">
+      <aside className={clsx("sidebar", !sidebarOpen && "sidebar-collapsed")}>
+        <Link className="brand" href="/manager/dashboard">
+          <span className="brand-mark">Z</span>
+          {sidebarOpen && <span><p className="brand-title">Zivira Labs</p><p className="brand-subtitle">Manager Portal</p></span>}
+        </Link>
+        <nav>
+          {nav.map(item => {
+            const Icon = item.icon;
+            const active = pathname === item.href || pathname.startsWith(item.href + "/");
+            return (
+              <Link className={clsx("nav-link", active && "nav-link-active")} href={item.href} key={item.href} title={!sidebarOpen ? item.title : undefined}>
+                <Icon size={18} />{sidebarOpen && <span>{item.title}</span>}
+              </Link>
+            );
+          })}
+        </nav>
+        {sidebarOpen && (
+          <div className="theme-panel">
+            <p className="nav-group-title">Theme</p>
+            <div className="theme-toggle">
+              <button className={clsx("theme-option", theme === "light" && "theme-option-active")} onClick={() => setTheme("light")} type="button"><Sun size={16} /> Light</button>
+              <button className={clsx("theme-option", theme === "dark"  && "theme-option-active")} onClick={() => setTheme("dark")}  type="button"><Moon size={16} /> Dark</button>
+            </div>
+          </div>
+        )}
+        <button className="nav-signout" onClick={signOut} type="button" title={!sidebarOpen ? "Sign out" : undefined}>
+          <LogOut size={16} />{sidebarOpen && "Sign out"}
+        </button>
+      </aside>
+      <main className="main">
+        <header className="topbar">
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <button className="button button-secondary sidebar-toggle-btn" onClick={() => setSidebarOpen(o => !o)} type="button" title={sidebarOpen ? "Collapse" : "Expand"}>
+              {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+            </button>
+            <div><h1 className="topbar-title">Manager Portal</h1><p className="topbar-subtitle">Zivira Labs · Field Management</p></div>
+          </div>
+          <div className="topbar-actions">
+            <span className="badge"><Users size={15} /> Manager</span>
+          </div>
+        </header>
+        <div className="content">{children}</div>
+      </main>
+    </div>
+  );
+}
