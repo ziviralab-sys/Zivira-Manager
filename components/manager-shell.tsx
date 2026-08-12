@@ -4,7 +4,7 @@ import { BarChart3, Grid3x3, Home, LogOut, MapPinned, Moon, PanelLeftClose, Pane
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { clearToken } from "@/lib/api-client";
+import { apiClient, clearToken } from "@/lib/api-client";
 
 const nav = [
   { href: "/manager/dashboard",      title: "Dashboard",       icon: Home },
@@ -20,6 +20,7 @@ export function ManagerShell({ children }: { children: React.ReactNode }) {
   const router   = useRouter();
   const [theme, setTheme]       = useState<"light"|"dark">("light");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [managerName, setManagerName] = useState<string | null>(null);
 
   useEffect(() => {
     const t = window.localStorage.getItem("zivira.manager.theme");
@@ -27,6 +28,14 @@ export function ManagerShell({ children }: { children: React.ReactNode }) {
     const s = window.localStorage.getItem("zivira.manager.sidebar");
     if (s === "closed") setSidebarOpen(false);
   }, []);
+
+  // BUG FIXED: the topbar badge just said the literal word "Manager" — it
+  // never showed who was actually signed in. Pull the real name from the
+  // same dashboard call every manager page already makes.
+  useEffect(() => {
+    if (pathname === "/manager/login") return;
+    apiClient.dashboard().then((r) => setManagerName(r.data.manager.name)).catch(() => {});
+  }, [pathname]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -81,7 +90,7 @@ export function ManagerShell({ children }: { children: React.ReactNode }) {
             <div><h1 className="topbar-title">Manager Portal</h1><p className="topbar-subtitle">Zivira Labs · Field Management</p></div>
           </div>
           <div className="topbar-actions">
-            <span className="badge"><Users size={15} /> Manager</span>
+            <span className="badge"><Users size={15} /> {managerName ?? "Manager"}</span>
           </div>
         </header>
         <div className="content">{children}</div>
