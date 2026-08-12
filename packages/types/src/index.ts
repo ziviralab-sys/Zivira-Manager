@@ -245,3 +245,32 @@ export type TourPlan = {
   createdAt: string;
   updatedAt: string;
 };
+
+// ── PRD 12.5 follow-up — Expense Claims (GST Branch → claims linkage) ──
+export type ExpenseClaimCategory = "Travel" | "Lodging" | "Food" | "Local Conveyance" | "Other";
+export type ExpenseClaimStatus = "SUBMITTED" | "APPROVED" | "REJECTED";
+
+export type ExpenseClaim = {
+  id: string;
+  tenantSlug: string;
+  claimId: string;
+  employeeCode: string;
+  employeeName?: string;
+  assignedManager: string;
+  tpId: string;
+  month: string;
+  gstBranchCode?: string;
+  gstBranchName?: string;
+  category: ExpenseClaimCategory;
+  expenseDate: string;
+  amountRs: number;
+  description?: string;
+  status: ExpenseClaimStatus;
+  approvedBy?: string;
+  approvedAt?: string;
+  rejectedBy?: string;
+  rejectReason?: string;
+  rejectedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};

@@ -1,4 +1,4 @@
-import type { ApiEnvelope, CompanyDashboard, DcrExtended, Doctor, Employee, ManagerDashboard, Product, TourPlan, VisitCoverageGrid } from "@zivira/types";
+import type { ApiEnvelope, CompanyDashboard, DcrExtended, Doctor, Employee, ManagerDashboard, Product, TourPlan, VisitCoverageGrid, ExpenseClaim } from "@zivira/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://zivira-labs-backend-1.onrender.com/api";
 const TOKEN_KEY = "zivira.manager.token";
@@ -47,5 +47,12 @@ export const apiClient = {
     request<{ original: TourPlan; created: TourPlan }>(`/manager/tour-plans/${tpId}/reassign`, { method: "POST", body: JSON.stringify({ reason }) }),
 
   // PRD 12.2 — Visit Coverage grid
-  visitCoverage: (month?: string) => request<VisitCoverageGrid>(`/manager/visit-coverage${month ? `?month=${month}` : ""}`)
+  visitCoverage: (month?: string) => request<VisitCoverageGrid>(`/manager/visit-coverage${month ? `?month=${month}` : ""}`),
+
+  // PRD 12.5 follow-up — Expense Claims linked to a Tour Plan's GST branch
+  expenseClaims: () => request<ExpenseClaim[]>("/manager/expense-claims"),
+  expenseClaimsCrossTeam: () => request<ExpenseClaim[]>("/manager/expense-claims/cross-team"),
+  approveExpenseClaim: (claimId: string) => request<ExpenseClaim>(`/manager/expense-claims/${claimId}/approve`, { method: "PATCH" }),
+  rejectExpenseClaim: (claimId: string, reason: string) =>
+    request<ExpenseClaim>(`/manager/expense-claims/${claimId}/reject`, { method: "PATCH", body: JSON.stringify({ reason }) })
 };
