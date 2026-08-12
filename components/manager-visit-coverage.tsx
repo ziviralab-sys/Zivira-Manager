@@ -48,7 +48,7 @@ export function ManagerVisitCoverage() {
             {grid?.rows.map(row => (
               <tr key={row.doctorId}>
                 <td><strong style={{ color: "var(--ink)" }}>{row.doctorName}</strong></td>
-                <td style={{ fontSize: 12, color: "var(--muted)" }}>{row.mappedEmployeeCode ?? "—"}</td>
+                <td style={{ fontSize: 12, color: "var(--muted)" }}>{row.mappedEmployeeName ?? row.mappedEmployeeCode ?? "—"}</td>
                 {row.cells.map(cell => {
                   const sc = cellColor(cell.visitCount);
                   return (

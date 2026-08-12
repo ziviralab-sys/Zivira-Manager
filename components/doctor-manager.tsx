@@ -119,7 +119,7 @@ export function DoctorManager() {
                 <td>{doctor.territory}</td>
                 <td>
                   {doctor.mappedEmployeeCode
-                    ? <span style={{ color: "var(--brand-strong)", fontWeight: 700 }}>{doctor.mappedEmployeeCode}</span>
+                    ? <span style={{ color: "var(--brand-strong)", fontWeight: 700 }}>{doctor.mappedEmployeeName ?? doctor.mappedEmployeeCode}</span>
                     : <span className="badge badge-danger">Unassigned</span>
                   }
                 </td>

@@ -91,7 +91,7 @@ export function ManagerDcrList() {
               return (
                 <tr key={dcr.id} style={dcr.overVisitFlag ? { background: "#fff8e8" } : undefined}>
                   <td style={{ color:"var(--muted)" }}>{i+1}</td>
-                  <td><strong style={{ color:"var(--ink)" }}>{dcr.employeeCode}</strong></td>
+                  <td><strong style={{ color:"var(--ink)" }}>{dcr.employeeName ?? dcr.employeeCode}</strong>{dcr.employeeName ? <span className="muted" style={{ fontSize: 11 }}> ({dcr.employeeCode})</span> : null}</td>
                   <td style={{ color:"var(--muted)", fontSize:12 }}>{getDoctorName(dcr.doctorId) || "—"}</td>
                   <td><span style={{ fontSize:11, fontWeight:600, color:"var(--muted)" }}>{dcr.callSession ?? "—"}</span></td>
                   <td style={{ fontSize:12, color:"var(--muted)" }}>{dcr.callTime ?? "—"}</td>

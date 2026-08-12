@@ -78,6 +78,7 @@ export type Doctor = {
   city: string;
   territory: string;
   mappedEmployeeCode?: string;
+  mappedEmployeeName?: string;
   status: "ACTIVE" | "INACTIVE";
   createdAt: string;
   updatedAt: string;
@@ -99,6 +100,7 @@ export type Dcr = {
   id: string;
   tenantSlug: string;
   employeeCode: string;
+  employeeName?: string;
   doctorId?: string | Doctor;
   visitDate: string;
   productsDetailed: string[];
@@ -166,6 +168,7 @@ export type DcrExtended = Dcr & {
   inputsGiven?: InputGiven[];
   jointWork?: JointWork;
   managerApprovedBy?: string;
+  managerApprovedByName?: string;
   managerApprovedAt?: string;
   adminVisibleAt?: string;
   overVisitFlag?: boolean;
@@ -196,6 +199,7 @@ export type VisitCoverageGrid = {
     doctorId: string;
     doctorName: string;
     mappedEmployeeCode?: string;
+    mappedEmployeeName?: string;
     cells: { employeeCode: string; visitCount: number }[];
   }[];
 };
@@ -259,6 +263,7 @@ export type ExpenseClaim = {
   employeeCode: string;
   employeeName?: string;
   assignedManager: string;
+  assignedManagerName?: string;
   tpId: string;
   month: string;
   gstBranchCode?: string;
