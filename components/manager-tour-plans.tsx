@@ -17,6 +17,7 @@ type ActionKind = "void" | "reassign" | "reject";
 export function ManagerTourPlans() {
   const [crossTeam, setCrossTeam] = useState(false);
   const [tps, setTps] = useState<TourPlan[]>([]);
+  const [myEmployeeCode, setMyEmployeeCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionTarget, setActionTarget] = useState<{ tp: TourPlan; kind: ActionKind } | null>(null);
@@ -31,6 +32,10 @@ export function ManagerTourPlans() {
     } catch (e) { setError(e instanceof Error ? e.message : "Load failed"); }
     finally { setLoading(false); }
   }
+
+  useEffect(() => {
+    apiClient.dashboard().then(r => setMyEmployeeCode(r.data.manager.employeeCode)).catch(() => {});
+  }, []);
 
   useEffect(() => { void load(); }, [crossTeam]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -109,7 +114,12 @@ export function ManagerTourPlans() {
           <tbody>
             {tps.map(tp => {
               const sc = STATUS_COLORS[tp.status] ?? STATUS_COLORS.DRAFT;
-              const canApprove = tp.status === "SUBMITTED";
+              // Only the assigned manager can approve/reject (matches the
+              // backend's requireRole check) — in Cross-Team view that's not
+              // always the manager viewing the screen, so gate on it here
+              // too instead of showing a button that will just 403.
+              const isMine = !myEmployeeCode || tp.assignedManager === myEmployeeCode;
+              const canApprove = tp.status === "SUBMITTED" && isMine;
               const canVoid = tp.status !== "VOIDED";
               return (
                 <tr key={tp.id}>
