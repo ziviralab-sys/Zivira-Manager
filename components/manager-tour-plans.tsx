@@ -127,10 +127,10 @@ export function ManagerTourPlans() {
                   <td>{tp.employeeName ?? tp.employeeCode}</td>
                   <td>{tp.month}</td>
                   <td style={{ fontSize: 12, color: "var(--muted)" }}>{tp.locations.length} location(s)</td>
-                  <td style={{ fontSize: 12 }}>{tp.assignedManager}</td>
+                  <td style={{ fontSize: 12 }}>{tp.assignedManagerName ?? tp.assignedManager}{tp.assignedManagerName ? <span className="muted"> ({tp.assignedManager})</span> : null}</td>
                   <td><span style={{ ...sc, borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{tp.status}</span></td>
                   <td style={{ fontSize: 12, color: "var(--muted)" }}>
-                    {tp.status === "VOIDED" && `Voided by ${tp.voidedBy}: ${tp.voidReason}${tp.reassignedToTpId ? ` → ${tp.reassignedToTpId}` : ""}`}
+                    {tp.status === "VOIDED" && `Voided by ${tp.voidedByName ?? tp.voidedBy}: ${tp.voidReason}${tp.reassignedToTpId ? ` → ${tp.reassignedToTpId}` : ""}`}
                     {tp.parentTpId && `Reassigned from ${tp.parentTpId}`}
                   </td>
                   <td>

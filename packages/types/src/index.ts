@@ -242,6 +242,8 @@ export type TourPlan = {
   parentTpId?: string;
   gstBranchCode?: string;
   gstBranchName?: string;
+  assignedManagerName?: string;
+  voidedByName?: string;
   createdAt: string;
   updatedAt: string;
 };
