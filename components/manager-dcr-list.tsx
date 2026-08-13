@@ -20,6 +20,25 @@ function getDoctorName(doctorId: DcrExtended["doctorId"]) {
   return "";
 }
 
+// Zivira_Project_Basic.docx Topic 1 — surfaces Visit Information + Doctor
+// Feedback in the reviewer table without widening it: a compact badge plus
+// a native tooltip carrying the full detail (hospital, check-in/out, notes).
+const INTEREST_COLORS: Record<string, { bg: string; color: string }> = {
+  HIGH:   { bg:"#dcfce7", color:"#15803d" },
+  MEDIUM: { bg:"#fef9c3", color:"#a16207" },
+  LOW:    { bg:"#fee2e2", color:"#b91c1c" },
+  NONE:   { bg:"#f3f4f6", color:"#6b7280" }
+};
+function feedbackTitle(dcr: DcrExtended) {
+  const parts: string[] = [];
+  if (dcr.hospitalClinic) parts.push(`Hospital/Clinic: ${dcr.hospitalClinic}`);
+  if (dcr.checkInTime || dcr.checkOutTime) parts.push(`Visit: ${dcr.checkInTime ?? "—"} to ${dcr.checkOutTime ?? "—"}${dcr.visitDurationMinutes ? ` (${dcr.visitDurationMinutes} min)` : ""}`);
+  if (dcr.productFeedback) parts.push(`Feedback: ${dcr.productFeedback}`);
+  if (dcr.competitorMentioned) parts.push(`Competitor mentioned: ${dcr.competitorMentioned}`);
+  if (dcr.followUpRequired) parts.push(`Follow-up required${dcr.followUpDate ? ` by ${new Date(dcr.followUpDate).toLocaleDateString("en-IN")}` : ""}`);
+  return parts.join("\n") || "No additional visit details captured";
+}
+
 export function ManagerDcrList() {
   const [dcrs, setDcrs]       = useState<DcrExtended[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +101,7 @@ export function ManagerDcrList() {
       <div className="subdivision-table-card">
         <table className="subdivision-table">
           <thead>
-            <tr><th>S.No</th><th>Employee</th><th>Doctor</th><th>Session</th><th>Time</th><th>Products</th><th>Samples</th><th>Inputs</th><th>Joint Work</th><th>Override</th><th>Status</th><th>Actions</th></tr>
+            <tr><th>S.No</th><th>Employee</th><th>Doctor</th><th>Session</th><th>Time</th><th>Products</th><th>Samples</th><th>Inputs</th><th>Joint Work</th><th>Feedback</th><th>Override</th><th>Status</th><th>Actions</th></tr>
           </thead>
           <tbody>
             {dcrs.map((dcr, i) => {
@@ -99,6 +118,13 @@ export function ManagerDcrList() {
                   <td style={{ fontSize:12 }}>{dcr.samplesGiven?.length ? dcr.samplesGiven.map(s => `${s.productName}×${s.qty}`).join(", ") : "—"}</td>
                   <td style={{ fontSize:12 }}>{dcr.inputsGiven?.length ? dcr.inputsGiven.map(s => `${s.itemType ?? s.inputName}×${s.qty}`).join(", ") : "—"}</td>
                   <td style={{ fontSize:12 }}>{dcr.jointWork?.accompanyingManager ? `${dcr.jointWork.accompanyingManager} · ${dcr.jointWork.jointWorkType?.replace(/_/g," ")}` : "—"}</td>
+                  <td title={feedbackTitle(dcr)}>
+                    {dcr.prescriptionInterest ? (
+                      <span style={{ ...(INTEREST_COLORS[dcr.prescriptionInterest] ?? INTEREST_COLORS.NONE), borderRadius:6, padding:"2px 8px", fontSize:11, fontWeight:700, cursor:"help" }}>
+                        {dcr.prescriptionInterest}{dcr.followUpRequired ? " ·  FU" : ""}
+                      </span>
+                    ) : <span style={{ color:"var(--muted)", fontSize:12 }}>—</span>}
+                  </td>
                   <td>
                     {dcr.overVisitFlag ? (
                       <span style={{ background: "#fef3c7", color: "#92400e", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>
@@ -125,7 +151,7 @@ export function ManagerDcrList() {
               );
             })}
             {!loading && dcrs.length === 0 && (
-              <tr><td colSpan={12} style={{ textAlign:"center", color:"var(--muted)", padding:40 }}>No DCRs yet</td></tr>
+              <tr><td colSpan={13} style={{ textAlign:"center", color:"var(--muted)", padding:40 }}>No DCRs yet</td></tr>
             )}
           </tbody>
         </table>

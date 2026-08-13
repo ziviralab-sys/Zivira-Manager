@@ -150,7 +150,8 @@ export type ApiEnvelope<T> = {
 };
 
 // PRD 12.3A — productCode/batchNumber added; product picker only, no free text.
-export type SampleGiven = { productName: string; productCode?: string; qty: number; batchNumber?: string };
+// Zivira_Project_Basic.docx Topic 1 — priority is per-product, not per-visit.
+export type SampleGiven = { productName: string; productCode?: string; qty: number; batchNumber?: string; priority?: "HIGH" | "MEDIUM" | "LOW" };
 // PRD 12.3B — itemType/valueRs added; itemType feeds the MCI gift-value compliance alert.
 export type InputGiven  = { inputName: string; itemType?: string; qty: number; valueRs?: number };
 
@@ -159,6 +160,8 @@ export type JointWork = {
   jointWorkType?: "FIELD_WORK" | "ON_JOB_TRAINING" | "PERFORMANCE_REVIEW";
   managerObservations?: string;
 };
+
+export type GpsLocation = { latitude?: number; longitude?: number; label?: string };
 
 // Extended DCR (replaces old Dcr)
 export type DcrExtended = Dcr & {
@@ -173,6 +176,19 @@ export type DcrExtended = Dcr & {
   adminVisibleAt?: string;
   overVisitFlag?: boolean;
   overVisitCount?: number | null;
+  // ── Zivira_Project_Basic.docx Topic 1 — DCR Management Module ──────────
+  checkInTime?: string;
+  checkOutTime?: string;
+  gpsLocation?: GpsLocation;
+  hospitalClinic?: string;
+  visitDurationMinutes?: number;
+  promotionalMaterialsShared?: string[];
+  visualAidUsed?: boolean;
+  prescriptionInterest?: "HIGH" | "MEDIUM" | "LOW" | "NONE";
+  productFeedback?: string;
+  competitorMentioned?: string;
+  followUpRequired?: boolean;
+  followUpDate?: string;
 };
 
 export type ManagerDashboard = {
@@ -180,6 +196,76 @@ export type ManagerDashboard = {
   team: Employee[];
   stats: { totalDcrs: number; pendingApproval: number; approvedToday: number; teamSize: number };
 };
+
+// ── Zivira_Project_Basic.docx Topic 2 — Attendance & Compliance Analytics
+// Topic 4 — Chronic Defaulter Detection ─────────────────────────────────
+export type ComplianceWarningLevel = "NONE" | "LOW" | "MEDIUM" | "HIGH";
+export type EmployeeComplianceRow = {
+  employeeCode: string;
+  employeeName?: string;
+  role?: string;
+  submittedToday: boolean;
+  pendingDCR: boolean;
+  missedYesterday: boolean;
+  missedThisWeek: number;
+  missedThisMonth: number;
+  expectedThisMonth: number;
+  submittedThisMonth: number;
+  compliancePercent: number;
+  missedLast30Days: number;
+  chronicDefaulter: boolean;
+  warningLevel: ComplianceWarningLevel;
+  salaryHold: boolean;
+};
+export type ComplianceSummary = {
+  submittedToday: number;
+  pendingDCR: number;
+  missedYesterday: number;
+  chronicDefaulters: number;
+  avgCompliancePercent: number;
+};
+export type ComplianceResponse = { data: EmployeeComplianceRow[]; month: string; summary: ComplianceSummary };
+
+// ── Zivira_Project_Basic.docx Topic 3 — Salary Integration Engine ──────
+export type PayrollWorkflowStatus = "RELEASED" | "HOLD" | "EXPLANATION_SUBMITTED";
+export type PayrollStatusRecord = {
+  id: string;
+  employeeCode: string;
+  employeeName?: string;
+  role?: string;
+  month: string;
+  status: PayrollWorkflowStatus;
+  holdReason?: string | null;
+  missedDaysSnapshot: number;
+  employeeExplanation?: string | null;
+  explanationSubmittedAt?: string | null;
+  managerApprovedBy?: string | null;
+  managerApprovedByName?: string | null;
+  managerApprovedAt?: string | null;
+  releasedAt?: string | null;
+};
+export type PayrollSummary = { onHold: number; pendingApproval: number; released: number };
+export type PayrollResponse = { data: PayrollStatusRecord[]; month: string; summary: PayrollSummary };
+
+// ── Zivira_Project_Basic.docx Topic 5 — Representative vs Manager Analysis
+// Topic 6 — Joint Field Work Analysis ───────────────────────────────────
+export type RepAnalysisRow = {
+  employeeCode: string;
+  employeeName?: string;
+  reportingManager?: string | null;
+  reportingManagerName?: string;
+  doctorsVisited: number;
+  totalVisits: number;
+  jointVisits: number;
+  jointVisitPercent: number;
+};
+export type TeamJointWorkSummary = {
+  teamSize: number;
+  totalJointCalls: number;
+  avgJointCallsPerRep: number;
+  jointCallPercent: number;
+};
+export type RepManagerTeamResponse = { data: RepAnalysisRow[]; month: string; teamSummary: TeamJointWorkSummary };
 
 // ── PRD 12.2 — Visit Coverage grid ──────────────────────────────────────
 export type VisitSummaryRow = {

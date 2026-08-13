@@ -1,6 +1,6 @@
 "use client";
 import clsx from "clsx";
-import { BarChart3, Grid3x3, Home, LogOut, MapPinned, Moon, PanelLeftClose, PanelLeftOpen, Receipt, Sun, Users } from "lucide-react";
+import { BarChart3, Grid3x3, Home, LogOut, MapPinned, Moon, PanelLeftClose, PanelLeftOpen, Receipt, ShieldAlert, Sun, Users, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -12,6 +12,8 @@ const nav = [
   { href: "/manager/tour-plans",     title: "Tour Plans",       icon: MapPinned },
   { href: "/manager/expense-claims", title: "Expense Claims",   icon: Receipt },
   { href: "/manager/visit-coverage", title: "Visit Coverage",   icon: Grid3x3 },
+  { href: "/manager/compliance",     title: "Compliance",       icon: ShieldAlert },
+  { href: "/manager/rep-analysis",   title: "Rep Analysis",     icon: UsersRound },
   { href: "/manager/team",           title: "My Team",          icon: Users }
 ];
 

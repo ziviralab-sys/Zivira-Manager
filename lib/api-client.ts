@@ -1,4 +1,4 @@
-import type { ApiEnvelope, CompanyDashboard, DcrExtended, Doctor, Employee, ManagerDashboard, Product, TourPlan, VisitCoverageGrid, ExpenseClaim } from "@zivira/types";
+import type { ApiEnvelope, CompanyDashboard, DcrExtended, Doctor, Employee, ManagerDashboard, Product, TourPlan, VisitCoverageGrid, ExpenseClaim, ComplianceResponse, EmployeeComplianceRow, PayrollResponse, PayrollStatusRecord, RepManagerTeamResponse, RepAnalysisRow } from "@zivira/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://zivira-labs-backend-1.onrender.com/api";
 const TOKEN_KEY = "zivira.manager.token";
@@ -48,6 +48,22 @@ export const apiClient = {
 
   // PRD 12.2 — Visit Coverage grid
   visitCoverage: (month?: string) => request<VisitCoverageGrid>(`/manager/visit-coverage${month ? `?month=${month}` : ""}`),
+
+  // Zivira_Project_Basic.docx Topic 2/4 — Attendance & Compliance Analytics
+  // / Chronic Defaulter Detection (team-scoped)
+  compliance: (month?: string) =>
+    request<EmployeeComplianceRow[]>(`/manager/analytics/compliance${month ? `?month=${month}` : ""}`) as Promise<ComplianceResponse>,
+
+  // Zivira_Project_Basic.docx Topic 3 — Salary Integration Engine (team-scoped)
+  payroll: (month?: string) =>
+    request<PayrollStatusRecord[]>(`/manager/analytics/payroll${month ? `?month=${month}` : ""}`) as Promise<PayrollResponse>,
+  approvePayroll: (id: string) => request<PayrollStatusRecord>(`/manager/analytics/payroll/${id}/approve`, { method: "PATCH" }),
+  rejectPayroll: (id: string, reason: string) =>
+    request<PayrollStatusRecord>(`/manager/analytics/payroll/${id}/reject`, { method: "PATCH", body: JSON.stringify({ reason }) }),
+
+  // Zivira_Project_Basic.docx Topic 5/6 — Rep vs Manager / Joint Field Work (team-scoped)
+  repManagerAnalysis: (month?: string) =>
+    request<RepAnalysisRow[]>(`/manager/analytics/rep-manager${month ? `?month=${month}` : ""}`) as Promise<RepManagerTeamResponse>,
 
   // PRD 12.5 follow-up — Expense Claims linked to a Tour Plan's GST branch
   expenseClaims: () => request<ExpenseClaim[]>("/manager/expense-claims"),
